@@ -49,6 +49,7 @@ exports.down = function down(done) {
 };
 `;
 
+
 export default class Migrator {
 	constructor({
 								templatePath,
@@ -61,7 +62,7 @@ export default class Migrator {
 								cli = false,
 								connection
 							}) {
-		const defaultTemplate = typescript || es6Templates ? es6Template : es5Template;
+		const defaultTemplate = (typescript || es6Templates) ?  es6Template : es5Template;
 		this.template = templatePath ? fs.readFileSync(templatePath, 'utf-8') : defaultTemplate;
 		this.migrationPath = path.resolve(migrationsPath);
 		this.connection = connection || mongoose.createConnection(dbConnectionUri);
@@ -70,10 +71,10 @@ export default class Migrator {
 		this.collection = collectionName;
 		this.autosync = autosync;
 		this.cli = cli;
-		MigrationModel = MigrationModelFactory(collectionName, this.connection,{typescript});
+		MigrationModel = MigrationModelFactory(collectionName, this.connection, {typescript});
 	}
 
-	log(logString, force = false) {
+	log (logString, force = false) {
 		if (force || this.cli) {
 			console.log(logString);
 		}
@@ -83,7 +84,7 @@ export default class Migrator {
 	 * Use your own Mongoose connection object (so you can use this('modelname')
 	 * @param {mongoose.connection} connection - Mongoose connection
 	 */
-	setMongooseConnection(connection) {
+	setMongooseConnection (connection) {
 		MigrationModel = MigrationModelFactory(this.collection, connection)
 	}
 
@@ -95,9 +96,14 @@ export default class Migrator {
 		return this.connection ? this.connection.close() : Promise.resolve();
 	}
 
-	getMigrationFileName(rootName) {
-		if (this.typescript) return `${rootName}.ts`;
-		return `${rootName}.js`;
+	/**
+	 * Generate name for migration file with right extension
+	 * @param basename
+	 * @return {string}
+	 */
+	getMigrationFileName(basename) {
+		if (this.typescript) return `${basename}.ts`;
+		return `${basename}.js`;
 	}
 
 	/**
@@ -107,7 +113,7 @@ export default class Migrator {
 	 */
 	async create(migrationName) {
 		try {
-			const existingMigration = await MigrationModel.findOne({name: migrationName});
+			const existingMigration = await MigrationModel.findOne({ name: migrationName });
 			if (!!existingMigration) {
 				throw new Error(`There is already a migration with name '${migrationName}' in the database`.red);
 			}
@@ -120,12 +126,12 @@ export default class Migrator {
 			// create instance in db
 			await this.connection;
 			const migrationCreated = await MigrationModel.create({
-				name     : migrationName,
+				name: migrationName,
 				createdAt: now
 			});
 			this.log(`Created migration ${migrationName} in ${this.migrationPath}.`);
 			return migrationCreated;
-		} catch (error) {
+		} catch(error){
 			this.log(error.stack);
 			fileRequired(error);
 		}
@@ -151,15 +157,16 @@ export default class Migrator {
 
 		let query = {
 			createdAt: {$lte: untilMigration.createdAt},
-			state    : 'down'
+			state: 'down'
 		};
 
 		if (direction == 'down') {
 			query = {
 				createdAt: {$gte: untilMigration.createdAt},
-				state    : 'up'
+				state: 'up'
 			};
 		}
+
 
 		const sortDirection = direction == 'up' ? 1 : -1;
 		const migrationsToRun = await MigrationModel.find(query)
@@ -215,12 +222,12 @@ export default class Migrator {
 			}
 
 			if (!migrationFunctions[direction]) {
-				throw new Error(`The ${direction} export is not defined in ${migration.filename}.`.red);
+				throw new Error (`The ${direction} export is not defined in ${migration.filename}.`.red);
 			}
 
 			try {
-				await new Promise((resolve, reject) => {
-					const callPromise = migrationFunctions[direction].call(
+				await new Promise( (resolve, reject) => {
+					const callPromise =  migrationFunctions[direction].call(
 						this.connection.model.bind(this.connection),
 						function callback(err) {
 							if (err) return reject(err);
@@ -233,15 +240,15 @@ export default class Migrator {
 					}
 				});
 
-				this.log(`${direction.toUpperCase()}:   `[direction == 'up' ? 'green' : 'red'] + ` ${migration.filename} `);
+				this.log(`${direction.toUpperCase()}:   `[direction == 'up'? 'green' : 'red'] + ` ${migration.filename} `);
 
 				await MigrationModel.where({name: migration.name}).update({$set: {state: direction}});
 				migrationsRan.push(migration.toJSON());
 				numMigrationsRan++;
-			} catch (err) {
+			} catch(err) {
 				this.log(`Failed to run migration ${migration.name} due to an error.`.red);
 				this.log(`Not continuing. Make sure your data is in consistent state`.red);
-				throw err instanceof (Error) ? err : new Error(err);
+				throw err instanceof(Error) ? err : new Error(err);
 			}
 		}
 
@@ -273,9 +280,9 @@ export default class Migrator {
 			if (!this.autosync && migrationsToImport.length) {
 				const answers = await new Promise(function (resolve) {
 					ask.prompt({
-						type   : 'checkbox',
+						type: 'checkbox',
 						message: 'The following migrations exist in the migrations folder but not in the database. Select the ones you want to import into the database',
-						name   : 'migrationsToImport',
+						name: 'migrationsToImport',
 						choices: filesNotInDb
 					}, (answers) => {
 						resolve(answers);
@@ -293,7 +300,7 @@ export default class Migrator {
 
 				this.log(`Adding migration ${filePath} into database from file system. State is ` + `DOWN`.red);
 				const createdMigration = await MigrationModel.create({
-					name     : migrationName,
+					name: migrationName,
 					createdAt: timestamp
 				});
 				return createdMigration.toJSON();
@@ -313,25 +320,26 @@ export default class Migrator {
 			const filesInMigrationFolder = fs.readdirSync(this.migrationPath);
 			const migrationsInDatabase = await MigrationModel.find({});
 			// Go over migrations in folder and delete any files not in DB
-			const migrationsInFolder = _.filter(filesInMigrationFolder, file => /\d{13,}\-.+.(js|ts)/.test(file))
+			const migrationsInFolder = _.filter(filesInMigrationFolder, file => /\d{13,}\-.+.(js|ts)/.test(file) )
 				.map(filename => {
 					const fileCreatedAt = parseInt(filename.split('-')[0]);
 					const existsInDatabase = migrationsInDatabase.some(m => filename == m.filename);
-					return {createdAt: fileCreatedAt, filename, existsInDatabase};
+					return { createdAt: fileCreatedAt, filename,  existsInDatabase };
 				});
 
 			const dbMigrationsNotOnFs = _.filter(migrationsInDatabase, m => {
-				return !_.find(migrationsInFolder, {filename: m.filename})
+				return !_.find(migrationsInFolder, { filename: m.filename })
 			});
 
-			let migrationsToDelete = dbMigrationsNotOnFs.map(m => m.name);
+
+			let migrationsToDelete = dbMigrationsNotOnFs.map( m => m.name );
 
 			if (!this.autosync && !!migrationsToDelete.length) {
 				const answers = await new Promise(function (resolve) {
 					ask.prompt({
-						type   : 'checkbox',
+						type: 'checkbox',
 						message: 'The following migrations exist in the database but not in the migrations folder. Select the ones you want to remove from the file system.',
-						name   : 'migrationsToDelete',
+						name: 'migrationsToDelete',
 						choices: migrationsToDelete
 					}, (answers) => {
 						resolve(answers);
@@ -343,18 +351,18 @@ export default class Migrator {
 
 			const migrationsToDeleteDocs = await MigrationModel
 				.find({
-					name: {$in: migrationsToDelete}
+					name: { $in: migrationsToDelete }
 				}).lean();
 
 			if (migrationsToDelete.length) {
 				this.log(`Removing migration(s) `, `${migrationsToDelete.join(', ')}`.cyan, ` from database`);
 				await MigrationModel.remove({
-					name: {$in: migrationsToDelete}
+					name: { $in: migrationsToDelete }
 				});
 			}
 
 			return migrationsToDeleteDocs;
-		} catch (error) {
+		} catch(error) {
 			this.log(`Could not prune extraneous migrations from database.`.red);
 			throw error;
 		}
@@ -371,11 +379,11 @@ export default class Migrator {
 	 */
 	async list() {
 		await this.sync();
-		const migrations = await MigrationModel.find().sort({createdAt: 1});
+		const migrations = await MigrationModel.find().sort({ createdAt: 1 });
 		if (!migrations.length) this.log('There are no migrations to list.'.yellow);
 		return migrations.map((m) => {
 			this.log(
-				`${m.state == 'up' ? 'UP:  \t' : 'DOWN:\t'}`[m.state == 'up' ? 'green' : 'red'] +
+				`${m.state == 'up' ? 'UP:  \t' : 'DOWN:\t'}`[m.state == 'up'? 'green' : 'red'] +
 				` ${m.filename}`
 			);
 			return m.toJSON();
@@ -383,11 +391,13 @@ export default class Migrator {
 	}
 }
 
+
+
 function fileRequired(error) {
 	if (error && error.code == 'ENOENT') {
 		throw new ReferenceError(`Could not find any files at path '${error.path}'`);
 	}
 }
 
-module.exports = Migrator;
 
+module.exports = Migrator;
