@@ -199,15 +199,7 @@ export default class Migrator {
 
 			if (this.typescript) {
 				require("ts-node").register({
-				ignoreWarnings: [
-					"2345",
-					"2346",
-					"2349",
-					"2350",
-					"2339",
-					"2459",
-					"1015",
-					"7027"]
+				disableWarnings: true
 				});
 			}
 
