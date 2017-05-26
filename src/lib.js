@@ -197,11 +197,11 @@ export default class Migrator {
         require('babel-polyfill');
       }
 
-			if (this.typescript) {
-				require("ts-node").register({
-				disableWarnings: true
-				});
-			}
+      if (this.typescript) {
+      	require("ts-node").register({
+      	 disableWarnings: true
+      	});
+      }
 
       let migrationFunctions;
 
