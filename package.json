@@ -1,6 +1,6 @@
 {
   "name": "migrate-mongoose-ts",
-  "version": "4.0.0-pre",
+  "version": "v0.0.1",
   "description": "A mongoose based migration framework for node",
   "main": "./src/lib.js",
   "scripts": {
