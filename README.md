@@ -1,5 +1,5 @@
-# migrate-mongoose
-A node based migration framework for ES6+ for mongoose
+# migrate-mongoose-ts
+A node based migration framework for ES6+ & Typescript for mongoose
 
 ## This is a fork of [migrate-mongoose](https://github.com/balmasi/migrate-mongoose) containing [changes](https://github.com/balmasi/migrate-mongoose/pull/24) from [akprats33](https://github.com/akprats33) for typescript support. Follows the upstream for major releases (initial release here is v4.0.0), minor and patch releases may not match.
 
