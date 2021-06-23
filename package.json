@@ -1,11 +1,10 @@
 {
-  "name": "migrate-mongoose",
-  "version": "4.0.0",
+  "name": "migrate-mongoose-ts",
+  "version": "4.0.0-pre",
   "description": "A mongoose based migration framework for node",
   "main": "./src/lib.js",
   "scripts": {
     "prepublish": "scripts/prepublish.sh",
-    "release": "np --no-tests",
     "test": "echo 'Error: no test specified'"
   },
   "bin": {
@@ -20,11 +19,15 @@
     "db",
     "nosql"
   ],
-  "author": "Borna Almasi <borna@borna-almasi.com>",
+  "authors": [
+    "Borna Almasi <borna@borna-almasi.com>",
+    "Anand Prajapati <anandprajapati389@gmail.com>",
+    "Eric Maryea <eric@maryea.org"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/balmasi/migrate-mongoose.git"
+    "url": "https://github.com/ericmaryea/migrate-mongoose-ts.git"
   },
   "dependencies": {
     "bluebird": "^3.5.0",
@@ -35,8 +38,5 @@
     "mongoose": "^5.6.3",
     "ts-node": "^10.0.0",
     "yargs": "^16.1.1"
-  },
-  "devDependencies": {
-    "np": "^7.0.0"
   }
 }
