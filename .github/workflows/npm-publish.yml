@@ -16,7 +16,7 @@ jobs:
     - run: npm ci
     - run: npm run prepublish
     - run: git config --global user.name "Github CD bot",
-    - run: npm version ${{ github.event.release.tag_name }}
+    - run: npm version ${{ github.event.release.tag_name }} --no-git-tag-version
     - run: npm publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
