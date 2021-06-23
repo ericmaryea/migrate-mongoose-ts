@@ -27,12 +27,6 @@
     "url": "https://github.com/balmasi/migrate-mongoose.git"
   },
   "dependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-core": "^6.24.1",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-polyfill": "^6.23.0",
-    "babel-preset-latest": "^6.24.1",
-    "babel-register": "^6.24.1",
     "bluebird": "^3.5.0",
     "colors": "^1.1.2",
     "dotenv": "^8.0.0",
