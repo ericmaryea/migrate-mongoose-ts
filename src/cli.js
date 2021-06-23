@@ -1,12 +1,16 @@
 #! /usr/bin/env node
 
-import path from 'path';
-import yargs from 'yargs';
-import 'colors';
+require('colors');
+const dotenv = require('dotenv');
+const path = require('path');
+const yargs = require('yargs');
 
-import Migrator from './lib';
+const Migrator = require('./lib');
 
-let  { argv: args } = yargs
+//get Env Variables from .env file
+dotenv.config();
+
+let { argv: args } = yargs
   .usage("Usage: migrate -d <mongo-uri> [[create|up|down <migration-name>]|list] [optional options]")
   .demand(1)
   .default('config', 'migrate')
@@ -33,21 +37,21 @@ let  { argv: args } = yargs
   )
 
   .command('list'.cyan, 'Lists all migrations and their current state.')
-  .example('$0 list')
+  .example('migrate list')
 
   .command('create <migration-name>'.cyan, 'Creates a new migration file.')
-  .example('$0 create add_users')
+  .example('migrate create add_users')
 
   .command('up [migration-name]'.cyan,
     'Migrates all the migration files that have not yet been run in chronological order. ' +
     'Not including [migration-name] will run UP on all migrations that are in a DOWN state.')
-  .example('$0 up add_user')
+  .example('migrate up add_user')
 
   .command('down <migration-name>'.cyan, 'Rolls back migrations down to given name (if down function was provided)')
-  .example('$0 down delete_names')
+  .example('migrate down delete_names')
 
   .command('prune'.cyan, 'Allows you to delete extraneous migrations by removing extraneous local migration files/database migrations.')
-  .example('$0 prune')
+  .example('migrate prune')
   .option('collection', {
     type: 'string',
     default: 'migrations',
@@ -87,7 +91,7 @@ let  { argv: args } = yargs
   .option('c', {
     alias: 'change-dir',
     type: 'string',
-    normalize:'true',
+    normalize: 'true',
     description: 'Change current working directory before running anything',
     nargs: 1
   })
@@ -101,7 +105,7 @@ let  { argv: args } = yargs
   .alias('h', 'help');
 
 // Destructure the command and following argument
-const [ command, migrationName = args['migration-name'] ] = args._;
+const [command, migrationName = args['migration-name']] = args._;
 
 if (!command) process.exit(1);
 
@@ -115,7 +119,7 @@ if (!args.dbConnectionUri) {
 }
 
 let migrator = new Migrator({
-  migrationsPath:  path.resolve(args['migrations-dir']),
+  migrationsPath: path.resolve(args['migrations-dir']),
   templatePath: args['template-file'],
   dbConnectionUri: args.dbConnectionUri,
   es6Templates: args.es6,
@@ -139,12 +143,12 @@ process.on('exit', () => {
 
 
 let promise;
-switch(command) {
+switch (command) {
   case 'create':
     validateSubArgs({ min: 1, max: 1, desc: 'You must provide only the name of the migration to create.'.red });
     promise = migrator.create(migrationName);
-    promise.then(()=> {
-      console.log(`Migration created. Run `+ `mongoose-migrate up ${migrationName}`.cyan + ` to apply the migration.`);
+    promise.then(() => {
+      console.log(`Migration created. Run ` + `mongoose-migrate up ${migrationName}`.cyan + ` to apply the migration.`);
     });
     break;
   case 'up':

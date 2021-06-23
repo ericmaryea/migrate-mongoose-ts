@@ -5,7 +5,7 @@ by using a config file (`migrate.json` by default), you can skip providing the o
 Now instead of running this command to create a new migration
 
 ```
-$ ./node_modules/.bin/migrate --es6 --migrationsDir db/migrations -d mongodb://localhost/db-dev create my_new_migration
+$ ./node_modules/.bin/migrate --migrationsDir db/migrations -d mongodb://localhost/db-dev create my_new_migration
 ```
 
 we can simply run

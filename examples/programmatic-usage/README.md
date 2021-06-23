@@ -8,7 +8,6 @@ var
  migrationsDir = '/path/to/migrations/',
  templatePath,
  dbUrl = 'mongodb://localhost/db',
- useES6 = true,
  collectionName = 'myMigrations',
  autosync = true;
 
@@ -16,7 +15,6 @@ let migrator = new migrateMongoose({
   migrationsPath:  migrationsDir, // Path to migrations directory
   templatePath: templatePath, // The template to use when creating migrations needs up and down functions exposed
   dbConnectionUri: dbUrl, // mongo url
-  es6Templates: useES6, // Should migrations be assumed to be using ES6?
   collectionName:  collectionName, // collection name to use for migrations (defaults to 'migrations')
   autosync: autosync // if making a CLI app, set this to false to prompt the user, otherwise true
 });
