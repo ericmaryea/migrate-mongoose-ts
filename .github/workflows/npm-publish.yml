@@ -1,0 +1,25 @@
+name: NPM Publish
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node_version: 14
+        registry_url: https://registry.npmjs.org/
+    - run: npm ci
+    - run: npm run prepublish
+    - run: git config --global user.name "Github CD bot",
+    - run: npm version ${{ github.event.release.tag_name }}
+    - run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    - run: git push
+      env:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
